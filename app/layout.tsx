@@ -6,19 +6,19 @@ import { Analytics } from "./components/analytics";
 
 export const metadata: Metadata = {
 	title: {
-		default: "chronark.com",
-		template: "%s | chronark.com",
+		default: "gas",
+		template: "%s | glue-it-and-screw-it.com",
 	},
-	description: "Software engineer at upstash.com and founder of planetfall.io",
+	description: "Woodworking and home renovation projects, how-to's, and product reviews.",
 	openGraph: {
-		title: "chronark.com",
+		title: "glue-it-and-screw-it.com",
 		description:
-			"Software engineer at upstash.com and founder of planetfall.io",
-		url: "https://chronark.com",
-		siteName: "chronark.com",
+			"Woodworking and home renovation projects, how-to's, and product reviews.",
+		url: "https://glue-it-and-screw-it.com",
+		siteName: "glue-it-and-screw-it.com",
 		images: [
 			{
-				url: "https://chronark.com/og.png",
+				url: "https://gas.com/og.png",
 				width: 1920,
 				height: 1080,
 			},
@@ -36,10 +36,6 @@ export const metadata: Metadata = {
 			"max-image-preview": "large",
 			"max-snippet": -1,
 		},
-	},
-	twitter: {
-		title: "Chronark",
-		card: "summary_large_image",
 	},
 	icons: {
 		shortcut: "/favicon.png",
@@ -62,14 +58,12 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" className={[inter.variable, calSans.variable].join(" ")}>
-			<head>
-				<Analytics />
-			</head>
 			<body
 				className={`bg-black ${
 					process.env.NODE_ENV === "development" ? "debug-screens" : undefined
 				}`}
 			>
+				<Analytics />
 				{children}
 			</body>
 		</html>
