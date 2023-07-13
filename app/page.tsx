@@ -3,8 +3,8 @@ import React from "react";
 import Particles from "./components/particles";
 
 const navigation = [
-	{ name: "Projects", href: "/projects" }//,
-	//{ name: "Project Plans", href: "/plans"},
+	{ name: "Projects", href: "/projects" },
+	{ name: "Reviews", href: "https://gas-reviews.com"},
 	//{ name: "Product Reviews", href: "/reviews" },
 ];
 
@@ -36,7 +36,7 @@ export default function Home() {
 			<div className="hidden w-screen h-px animate-glow md:block animate-fade-right bg-gradient-to-r from-zinc-300/0 via-zinc-300/50 to-zinc-300/0" />
 			<div className="my-16 text-center animate-fade-in">
 				<h2 className="text-sm text-zinc-500 ">
-					Welcome to glue-it-and-screw-it.com,<br></br>
+					Welcome to glue and screw,<br></br>
 					All things woodworking and home renovation projects, project plans, and honest, ad-free product reviews.
 				</h2>
 			</div>
