@@ -6,7 +6,7 @@ published: true
   
 ---
 
-<img alt="Coming Soon" src="/images/coming-soon.gif" />
+<img alt='Pi-Gate' src='/images/pi-gate/pigate.png' />
 
 ### Background
 I have a 50+ year-old garage door at my house.
@@ -72,13 +72,14 @@ Sounds like a win. No moving pins required.
 
 ### Assembly
 
-- Raspberry Pi 4 (the 4 is not required, a 3 should work. You could technically get 3 zeros/picos for this.)
-- 2 High Voltage Relays
-- Ribbon Pin Wires
-- Soldering Iron (optional)
-- WAGO Wire Nuts (optional)
-- 2 NC/NO Magnetic Switches (optional)
-- Optical Sensor (optional)
+- <a target="_blank" href="https://www.amazon.com/GeeekPi-Raspberry-4GB-Starter-Kit/dp/B0B3M2HKN6/ref=sr_1_2_sspa?keywords=raspberry+pi+4&amp;sr=8-2-spons&amp;ufe=app_do%253Aamzn1.fos.18ed3cb5-28d5-4975-8bc7-93deae8f9840&amp;sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&amp;psc=1&_encoding=UTF8&tag=gas0e0-20&linkCode=ur2&linkId=57423a1eeba3bb43c53efc8f5adda185&camp=1789&creative=9325">Raspberry Pi 4</a> (the 4 is not required, a 3 should work. You could technically get 3 zeros/picos for this.)
+- 2 <a target="_blank" href="https://www.amazon.com/gp/product/B0B8H42YQ5/ref=ppx_yo_dt_b_search_asin_image?ie=UTF8&amp;psc=1&_encoding=UTF8&tag=gas0e0-20&linkCode=ur2&linkId=390388da413631df155817ff22df52fe&camp=1789&creative=9325">High Voltage Relays</a>
+- <a target="_blank" href="https://www.amazon.com/EDGELEC-Breadboard-Optional-Assorted-Multicolored/dp/B07GD2BWPY/ref=sr_1_3?keywords=ribbon+cable&amp;s=industrial&amp;sr=1-3&_encoding=UTF8&tag=gas0e0-20&linkCode=ur2&linkId=1f195976afc308e88e32411d253e7e5e&camp=1789&creative=9325">Ribbon Pin Wires</a>
+- <a target="_blank" href="https://www.amazon.com/Weller-D550-Dual-Professional-Soldering/dp/B00002N5LO/ref=sr_1_31_sspa?keywords=Soldering+Iron&amp;s=industrial&amp;sr=1-31-spons&amp;sp_csd=d2lkZ2V0TmFtZT1zcF9idGY&amp;psc=1&_encoding=UTF8&tag=gas0e0-20&linkCode=ur2&linkId=e4f053fe0ca94ce91e5fdfb9f7e162de&camp=1789&creative=9325">Soldering Iron</a> (optional)
+- <a target="_blank" href="https://www.amazon.com/WAGO-Lever-Nuts-75pc-Connector-Assortment/dp/B018MGMFDI/ref=sr_1_5?keywords=WAGO+Wire+Nuts&amp;s=industrial&amp;sr=1-5&_encoding=UTF8&tag=gas0e0-20&linkCode=ur2&linkId=65ba3c630f52457faf4af042caafb9fe&camp=1789&creative=9325">WAGO Wire Nuts</a> (optional)
+- 2 <a target="_blank" href="https://www.amazon.com/Magnetic-Switch-Normally-Closed-Security/dp/B0735BP1K4/ref=sr_1_8?keywords=NC%252FNO+Magnetic+Switches&amp;s=industrial&amp;sr=1-8&_encoding=UTF8&tag=gas0e0-20&linkCode=ur2&linkId=4c35a4aae4d3a93bcc03c01062879b7d&camp=1789&creative=9325">NC NO Magnetic Switches</a> (optional)
+- <a target="_blank" href="https://www.amazon.com/Twidec-Photoelectric-Proximity-Infrared-E3F-20DNL-18/dp/B082PFXVYX/ref=sr_1_11?keywords=Optical+Sensor+garage+door&amp;s=industrial&amp;sr=1-11&_encoding=UTF8&tag=gas0e0-20&linkCode=ur2&linkId=53573589106c2ba8731c62443275a27b&camp=1789&creative=9325">Optical Sensor</a> (optional)
+- <a target="_blank" href="https://www.amazon.com/CQRobot-Consumption-Resistance-Temperature-Properties/dp/B07ZMGW3QJ/ref=sr_1_33?keywords=rain+sensor+pi&amp;s=industrial&amp;sr=1-33&_encoding=UTF8&tag=gas0e0-20&linkCode=ur2&linkId=543095dc4303c7f158406c2e88b98df0&camp=1789&creative=9325">Rain Sensor</a> (Optional)
 
 Start by mounting the RPi to an appropriately-sized board with the GPIO pins facing inwards. I used a scrap piece of wood cut down to approximately 2'x 2'.
 Align the relays with the controller blocks facing the RPi and mount them to the board.
@@ -94,14 +95,47 @@ Make sure you know exactly which GPIO pin goes to which relay and which function
 For the switches/sensors (garage door, magnetic switches, optical sensor), you will need one GND and one GPIO each.
 Wire the pins before mounting the assembled unit to the final location. I would wire pins for every accessory you may want prior to mounting it, even if it may be a while before you actually add the accessory.
 
+<img alt='wiring schematic' src='/images/pi-gate/wiring-schematic.png' />
+
 ### Logic
 
 I thought the logic would be the easy part, and it isn't overly complicated.
 However, there was a lot of trial and error. Set yourself up to handle an iterative production and you'll be better off.
 
-There are three main processes to account for (plus one for each sensor): Door controller, API, and switch watcher.
+There are three main processes to account for (plus one for each sensor): Door controller, API, and a button watcher.
 
-Each process should be standalone and self-contained with a mock process.
+Each process should be standalone and self-contained with a mock process that will allow you to test logic without a real execution.
 Additionally, the entire operation should be configurable easily.
 
-Let's start with the switch watcher. This process runs in an endless loop with the only task of watching the door switches and sending a message to the API process if triggered.
+Let's start with the button watcher. This process runs in an endless loop with the only task of watching the door switches and sending a message to the API process if triggered.
+The mock process for this service will merely print out if a button was activated to the console.
+
+Next the API. This is a simple API with only two endpoints: GET:'/gate/status' and POST:'/gate/activate'.
+All of the communication to the door controller comes through the API. The button watcher calls the API which, in turn, sends a message to the door controller through Redis.
+The API also checks for duration between requests. This is to prevent duplicate requests and to protect the equipment.
+The loop for the button watcher iterates 8 times per second (configurable via the config file), so a single press by a human may actually be logged 8 times within a second.
+Obviously, we don't want to trigger the relays in such a way. There are a plethora of potential improvements that can be made to this process, and the beauty of this set up is 
+that this can be completely refactored remotely without having to actually touch the equipment. I will polish this code up eventually, but I'm happy with the way it works at the moment.
+
+Finally, we have the door controller. The door controller watches a message queue for instructions on what to do and then triggers the relays to perform the activation process for the appropriately relay.
+The activation process is essentially: send OPEN signal both relays to ensure there is no conflicting action, send a CLOSE signal to the relay to be activated, wait for the specified duration, then send an OPEN pulse to both relays again.
+
+<img alt='service flow' src='/images/pi-gate/service-flow.png' />
+
+That's pretty much it, and now I have a garage door that works like a charm that I can activate from anywhere the WiFi covers as well as the existing buttons.
+
+The code for this project can be found <a target="_blank" href="https://github.com/mark-styx/gate-controller/tree/master" >here</>
+
+<img alt='wiring' src='/images/pi-gate/pi-gate.png' />
+<img alt='apple shortcut' src='/images/pi-gate/pi-gate2.png' />
+<img alt='apple shortcut2' src='/images/pi-gate/pi-gate3.png' />
+
+Potential improvements:
+- Make the logic for each service to operate optimally contained within its own process. The API handles the duplicate requests generally. Technically 
+each process should have its own de-duplication logic. The button sense process should know what a false positive looks like and ignore it for example. The Door Controller should be able to read messages from different components and handle them appropriately. 
+For example, say the Door Controller gets a message from the API and Button Watcher, the door controller should be able to manage that effectively.
+- Use the message queue to send signals directly from the Button Watcher to the Door Controller. The above is a prerequisite for this.
+- Optimize the relay activation process to provide quicker feedback. Right now, there is slight delay in order to make sure the operations are safe. The pause duration is probably overkill and the pulse signal can likely be shortened.
+- Give the Pi a static IP (I know lol)
+- Add the obstruction sensors and logic to hand obstructions. Potentially this could be a computer vision solution as well, since the door opens outward the potential obstruction space more complex than a standard door.
+- Add a rain/water sensor. This door opens outwards and when it rains heavily with the door water pools on top of it and drains into the garage. If there is rain, the door should keep a slope that forces water to drain out.
